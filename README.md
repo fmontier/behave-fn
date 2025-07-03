@@ -1,6 +1,6 @@
-# BDD Requirements Management - Frontend
+# Behave - Frontend
 
-Frontend en React para el sistema de gestión de requerimientos BDD (Behavior Driven Development).
+Frontend en React para el sistema de gestión de requerimientos Behave (Behavior Driven Development).
 
 ## Características
 

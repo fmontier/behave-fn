@@ -60,7 +60,7 @@ export default function Layout({ children }) {
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <TestTube2 className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-semibold text-gray-900">BDD Manager</span>
+              <span className="text-xl font-semibold text-gray-900">Behave</span>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}

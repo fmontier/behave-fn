@@ -48,7 +48,7 @@ const resources = {
       },
       // Dashboard
       dashboard: {
-        title: "BDD Requirements Dashboard",
+        title: "Behave Dashboard",
         stats: {
           totalProjects: "Total Projects",
           totalFeatures: "Total Features", 
@@ -76,7 +76,7 @@ const resources = {
         noProjects: "No projects found",
         noProjectsFound: "No projects found",
         createFirst: "Create your first project to get started",
-        createFirstProject: "Create your first project to manage your BDD requirements",
+        createFirstProject: "Create your first project to manage your Behave requirements",
         createYourFirstProject: "Create Your First Project",
         createProject: "Create Project",
         notFound: "Project Not Found",
@@ -329,7 +329,7 @@ const resources = {
       },
       // Dashboard
       dashboard: {
-        title: "Dashboard de Requerimientos BDD",
+        title: "Dashboard de Behave",
         stats: {
           totalProjects: "Total de Proyectos",
           totalFeatures: "Total de Funcionalidades",
@@ -357,7 +357,7 @@ const resources = {
         noProjects: "No se encontraron proyectos",
         noProjectsFound: "No se encontraron proyectos",
         createFirst: "Crea tu primer proyecto para comenzar",
-        createFirstProject: "Crea tu primer proyecto para gestionar tus requerimientos BDD",
+        createFirstProject: "Crea tu primer proyecto para gestionar tus requerimientos Behave",
         createYourFirstProject: "Crear Tu Primer Proyecto",
         createProject: "Crear Proyecto",
         notFound: "Proyecto No Encontrado",

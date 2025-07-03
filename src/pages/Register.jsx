@@ -55,7 +55,7 @@ export default function Register() {
             Crear Cuenta
           </h1>
           <p className="text-gray-600">
-            Regístrate para acceder al sistema BDD
+            Regístrate para acceder a Behave
           </p>
         </div>
 
