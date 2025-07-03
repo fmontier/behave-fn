@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from './contexts/AuthContext';
 import { ProjectProvider } from './contexts/ProjectContext';
 import ProjectLayout from './components/ProjectLayout';
 import ProjectSelection from './pages/ProjectSelection';
@@ -18,6 +19,9 @@ import Modules from './pages/Modules';
 import ModuleDetail from './pages/ModuleDetail';
 import Kanban from './pages/Kanban';
 import Analytics from './pages/Analytics';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -48,14 +52,31 @@ function App() {
       />
       
       <Router>
-        <ProjectProvider>
+        <AuthProvider>
           <Routes>
-            {/* Root route - Project selection */}
-            <Route path="/" element={<ProjectSelection />} />
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            {/* Protected routes */}
+            <Route path="/" element={
+              <ProtectedRoute>
+                <ProjectProvider>
+                  <ProjectSelection />
+                </ProjectProvider>
+              </ProtectedRoute>
+            } />
+            
             <Route path="/projects" element={<Navigate to="/" replace />} />
             
-            {/* Project-scoped routes */}
-            <Route path="/project/:projectId" element={<ProjectLayout />}>
+            {/* Project-scoped protected routes */}
+            <Route path="/project/:projectId" element={
+              <ProtectedRoute>
+                <ProjectProvider>
+                  <ProjectLayout />
+                </ProjectProvider>
+              </ProtectedRoute>
+            }>
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="modules" element={<Modules />} />
@@ -72,10 +93,10 @@ function App() {
               <Route path="settings" element={<ProjectDetail />} />
             </Route>
             
-            {/* Catch-all redirect to project selection */}
+            {/* Catch-all redirect */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </ProjectProvider>
+        </AuthProvider>
       </Router>
     </div>
   );

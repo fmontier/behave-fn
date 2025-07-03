@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Draggable } from '@hello-pangea/dnd';
+import { useNavigate } from 'react-router-dom';
+import { useProject } from '../../contexts/ProjectContext';
 import { 
   Calendar, 
   Tag, 
@@ -38,9 +40,18 @@ const getPriorityColor = (priority) => {
 
 const FeatureCard = ({ feature, index, modules = [] }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { projectId } = useProject();
   
   const getModule = (moduleId) => {
     return modules.find(m => m.id === moduleId);
+  };
+
+  const handleCardClick = (e) => {
+    // Only navigate if not dragging
+    if (!e.defaultPrevented) {
+      navigate(`/project/${projectId}/features/${feature.id}`);
+    }
   };
 
   return (
@@ -50,10 +61,11 @@ const FeatureCard = ({ feature, index, modules = [] }) => {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
+          onClick={handleCardClick}
           className={`
             bg-white rounded-lg border-l-4 shadow-sm hover:shadow-md transition-all duration-200 p-4 mb-3
             ${getPriorityColor(feature.priority)}
-            ${snapshot.isDragging ? 'rotate-2 shadow-xl transform scale-105 z-50' : 'cursor-grab active:cursor-grabbing'}
+            ${snapshot.isDragging ? 'rotate-2 shadow-xl transform scale-105 z-50' : 'cursor-pointer hover:cursor-pointer'}
             ${snapshot.isDragging ? '' : 'hover:shadow-lg hover:-translate-y-1'}
           `}
         >

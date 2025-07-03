@@ -153,10 +153,14 @@ const AnalyticsDashboard = ({ analyticsData, loading = false }) => {
     return null;
   };
 
+  // Check if we're showing time-based analytics only
+  const isTimeBasedOnly = time_based && !summary?.total_features;
+
   return (
     <div className="space-y-8">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Summary Cards - Only show if not time-based view */}
+      {!isTimeBasedOnly && summary && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <StatCard
           title={t('analytics.totalFeatures')}
           value={summary.total_features}
@@ -183,9 +187,11 @@ const AnalyticsDashboard = ({ analyticsData, loading = false }) => {
           icon={BarChart3}
           color="orange"
         />
-      </div>
+        </div>
+      )}
 
-      {/* Charts Grid */}
+      {/* Charts Grid - Only show if not time-based view */}
+      {!isTimeBasedOnly && distributions && (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Features by Status */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -285,9 +291,10 @@ const AnalyticsDashboard = ({ analyticsData, loading = false }) => {
           </div>
         )}
       </div>
+      )}
 
-      {/* Coverage Table */}
-      {coverage && coverage.length > 0 && (
+      {/* Coverage Table - Only show if not time-based view */}
+      {!isTimeBasedOnly && coverage && coverage.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <Target className="w-5 h-5 mr-2" />
@@ -345,6 +352,108 @@ const AnalyticsDashboard = ({ analyticsData, loading = false }) => {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* Time-Based Analytics Section */}
+      {time_based && (
+        <div className="space-y-6">
+          {/* Daily Activity Chart */}
+          {time_based.daily_activity && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <Activity className="w-5 h-5 mr-2 text-gray-500" />
+                {t('analytics.dailyActivity')}
+              </h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={Object.entries(time_based.daily_activity).map(([date, data]) => ({
+                  date: new Date(date).toLocaleDateString(),
+                  features: data.features,
+                  scenarios: data.scenarios
+                }))}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Area 
+                    type="monotone" 
+                    dataKey="features" 
+                    stackId="1"
+                    stroke={COLORS.primary} 
+                    fill={COLORS.primary} 
+                    name={t('features.features')}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="scenarios" 
+                    stackId="1"
+                    stroke={COLORS.success} 
+                    fill={COLORS.success} 
+                    name={t('scenarios.scenarios')}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Weekly Completion Chart */}
+          {time_based.weekly_completion && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <CheckCircle className="w-5 h-5 mr-2 text-gray-500" />
+                {t('analytics.weeklyCompletion')}
+              </h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={Object.entries(time_based.weekly_completion).map(([week, count]) => ({
+                  week,
+                  completed: count
+                }))}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="week" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="completed" fill={COLORS.success} name={t('analytics.completed')} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Period Summary */}
+          {time_based.period_summary && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <BarChart3 className="w-5 h-5 mr-2 text-gray-500" />
+                {t('analytics.periodSummary')}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary-600">
+                    {time_based.period_summary.total_features_created || 0}
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    {t('analytics.featuresCreated')}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-green-600">
+                    {time_based.period_summary.total_scenarios_created || 0}
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    {t('analytics.scenariosCreated')}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-blue-600">
+                    {time_based.period_summary.days || 0}
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    {t('analytics.daysAnalyzed')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

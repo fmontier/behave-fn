@@ -1,23 +1,26 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
-const ProtectedRoute = ({ children, redirectTo, message }) => {
-  const { t } = useTranslation();
-  
-  return (
-    <div className="animate-fade-in">
-      <div className="card p-8 text-center max-w-md mx-auto mt-16">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          {t('navigation.accessRestricted')}
-        </h3>
-        <p className="text-gray-600 mb-6">
-          {message || t('navigation.hierarchicalAccess')}
-        </p>
-        <Navigate to={redirectTo} replace />
+export default function ProtectedRoute({ children }) {
+  const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Verificando autenticación...</p>
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
 
-export default ProtectedRoute;
+  if (!isAuthenticated) {
+    // Redirect to login page with return url
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+}

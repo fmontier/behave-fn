@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ProjectContext } from '../contexts/ProjectContext';
+import { useProject } from '../contexts/ProjectContext';
 import { analyticsAPI } from '../services/api';
 import AnalyticsDashboard from '../components/analytics/AnalyticsDashboard';
 import {
@@ -15,7 +15,7 @@ import toast from 'react-hot-toast';
 
 export default function Analytics() {
   const { t } = useTranslation();
-  const { currentProject } = useContext(ProjectContext);
+  const { selectedProject } = useProject();
   const [analyticsData, setAnalyticsData] = useState(null);
   const [globalAnalytics, setGlobalAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,22 +24,22 @@ export default function Analytics() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (currentProject && viewMode === 'project') {
+    if (selectedProject && viewMode === 'project') {
       loadProjectAnalytics();
     } else if (viewMode === 'global') {
       loadGlobalAnalytics();
     } else if (viewMode === 'time-based') {
       loadTimeBasedAnalytics();
     }
-  }, [currentProject, viewMode, timeRange]);
+  }, [selectedProject, viewMode, timeRange]);
 
   const loadProjectAnalytics = async () => {
-    if (!currentProject) return;
+    if (!selectedProject) return;
     
     try {
       setLoading(true);
       setError(null);
-      const response = await analyticsAPI.getEnhancedDashboard(currentProject.id);
+      const response = await analyticsAPI.getEnhancedDashboard(selectedProject.id);
       setAnalyticsData(response.data.dashboard);
     } catch (err) {
       console.error('Error loading project analytics:', err);
@@ -69,9 +69,19 @@ export default function Analytics() {
     try {
       setLoading(true);
       setError(null);
-      const projectId = currentProject ? currentProject.id : null;
+      const projectId = selectedProject ? selectedProject.id : null;
       const response = await analyticsAPI.getTimeBasedAnalytics(projectId, timeRange);
-      setAnalyticsData(response.data.analytics);
+      
+      // Transform time-based data to match expected structure
+      const timeBasedData = {
+        summary: {}, // Empty summary for time-based view
+        distributions: {}, // Empty distributions for time-based view
+        coverage: [], // Empty coverage for time-based view
+        trends: {}, // Empty trends for time-based view
+        time_based: response.data.analytics // Put time data in the expected field
+      };
+      
+      setAnalyticsData(timeBasedData);
     } catch (err) {
       console.error('Error loading time-based analytics:', err);
       setError(err.message);
@@ -87,7 +97,7 @@ export default function Analytics() {
       if (!dataToDownload) return;
 
       const reportData = {
-        project: currentProject?.name || 'Global',
+        project: selectedProject?.name || 'Global',
         viewMode,
         timeRange,
         generatedAt: new Date().toISOString(),
@@ -216,7 +226,7 @@ export default function Analytics() {
     );
   };
 
-  if (!currentProject && viewMode === 'project') {
+  if (!selectedProject && viewMode === 'project') {
     return (
       <div className="animate-fade-in">
         <div className="text-center py-12">
@@ -241,8 +251,8 @@ export default function Analytics() {
             {t('analytics.title')}
           </h1>
           <p className="text-gray-600 mt-2">
-            {viewMode === 'project' && currentProject
-              ? `${t('analytics.projectAnalytics')} - ${currentProject.name}`
+            {viewMode === 'project' && selectedProject
+              ? `${t('analytics.projectAnalytics')} - ${selectedProject.name}`
               : viewMode === 'global'
               ? t('analytics.globalAnalytics')
               : t('analytics.timeBasedAnalytics')
@@ -281,7 +291,7 @@ export default function Analytics() {
                 ? 'border-blue-500 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
-            disabled={!currentProject}
+            disabled={!selectedProject}
           >
             <BarChart3 className="w-5 h-5 inline mr-2" />
             {t('analytics.projectView')}

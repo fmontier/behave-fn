@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useProject } from '../contexts/ProjectContext';
+import { useAuth } from '../contexts/AuthContext';
 import LanguageSelector from './LanguageSelector';
 import { 
   Home, 
@@ -15,7 +16,9 @@ import {
   GitBranch,
   Trello,
   Package,
-  BarChart3
+  BarChart3,
+  LogOut,
+  User
 } from 'lucide-react';
 
 export default function Layout({ children }) {
@@ -25,6 +28,7 @@ export default function Layout({ children }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { selectedProject, clearProject } = useProject();
+  const { user, logout } = useAuth();
 
   const navigation = [
     { name: t('nav.dashboard'), href: `/project/${projectId}/dashboard`, icon: Home, key: 'dashboard' },
@@ -151,9 +155,30 @@ export default function Layout({ children }) {
 
             <div className="flex items-center space-x-4">
               <LanguageSelector />
-              <div className="text-sm text-gray-500">
-                Behavior Driven Development
-              </div>
+              
+              {/* User Info */}
+              {user && (
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2 text-sm">
+                    <div className="flex items-center justify-center h-8 w-8 rounded-full bg-primary-100 text-primary-600">
+                      <User className="h-4 w-4" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-gray-900">{user.full_name}</span>
+                      <span className="text-xs text-gray-500">@{user.username}</span>
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={logout}
+                    className="flex items-center space-x-1 px-3 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                    title="Cerrar Sesión"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span className="hidden sm:block">Salir</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>

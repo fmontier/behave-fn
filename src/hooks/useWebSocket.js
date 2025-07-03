@@ -1,12 +1,12 @@
-import { useEffect, useContext } from 'react';
-import { ProjectContext } from '../contexts/ProjectContext';
+import { useEffect } from 'react';
+import { useProject } from '../contexts/ProjectContext';
 import websocketService from '../services/websocket';
 
 export const useWebSocket = (events = {}) => {
-  const { currentProject } = useContext(ProjectContext);
+  const { selectedProject } = useProject();
 
   useEffect(() => {
-    if (!currentProject) return;
+    if (!selectedProject) return;
 
     // Conectar al proyecto actual
     const userInfo = {
@@ -14,7 +14,7 @@ export const useWebSocket = (events = {}) => {
       name: localStorage.getItem('userName') || 'Usuario Anónimo'
     };
     
-    websocketService.connect(currentProject.id, userInfo);
+    websocketService.connect(selectedProject.id, userInfo);
 
     // Suscribirse a los eventos especificados
     const unsubscribers = [];
@@ -28,7 +28,7 @@ export const useWebSocket = (events = {}) => {
     return () => {
       unsubscribers.forEach(unsubscribe => unsubscribe());
     };
-  }, [currentProject, events]);
+  }, [selectedProject, events]);
 
   return {
     emitFeatureUpdate: websocketService.emitFeatureUpdate.bind(websocketService),

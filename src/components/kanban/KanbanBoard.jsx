@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DragDropContext } from '@hello-pangea/dnd';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useFeatures, useProjects, useModules } from '../../hooks/useApi';
 import { useWebSocket } from '../../hooks/useWebSocket';
+import { useProject } from '../../contexts/ProjectContext';
 import KanbanColumn from './KanbanColumn';
 import { 
   Filter, 
@@ -19,6 +21,8 @@ const FEATURE_STATUSES = ['draft', 'in_progress', 'completed'];
 
 const KanbanBoard = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { projectId } = useProject();
   const { features, loading, updateFeature, error, refetch } = useFeatures();
   const { projects } = useProjects();
   const { modules } = useModules();
@@ -132,7 +136,7 @@ const KanbanBoard = () => {
 
   const handleAddFeature = (status) => {
     // Redirigir a crear feature con estado predefinido
-    window.location.href = `/features/new?status=${status}`;
+    navigate(`/project/${projectId}/features/new?status=${status}`);
   };
 
   const getAvailableModules = () => {
@@ -210,10 +214,13 @@ const KanbanBoard = () => {
             {t('common.filter')}
           </button>
           
-          <a href="/features/new" className="btn btn-primary">
+          <button 
+            onClick={() => navigate(`/project/${projectId}/features/new`)}
+            className="btn btn-primary"
+          >
             <Plus className="w-5 h-5 mr-2" />
             {t('features.newFeature')}
-          </a>
+          </button>
         </div>
       </div>
 
@@ -289,8 +296,9 @@ const KanbanBoard = () => {
       </div>
 
       {/* Kanban Board */}
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="flex space-x-6 overflow-x-auto pb-4">
+      <div className="overflow-x-auto">
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <div className="flex space-x-6 min-w-max pb-4">
           {FEATURE_STATUSES.map((status) => (
             <KanbanColumn
               key={status}
@@ -300,8 +308,9 @@ const KanbanBoard = () => {
               modules={modules}
             />
           ))}
-        </div>
-      </DragDropContext>
+          </div>
+        </DragDropContext>
+      </div>
 
       {/* Empty State */}
       {filteredFeatures.length === 0 && !loading && (
@@ -319,10 +328,13 @@ const KanbanBoard = () => {
               : t('kanban.createFirst')
             }
           </p>
-          <a href="/features/new" className="btn btn-primary">
+          <button 
+            onClick={() => navigate(`/project/${projectId}/features/new`)}
+            className="btn btn-primary"
+          >
             <Plus className="w-5 h-5 mr-2" />
             {t('features.newFeature')}
-          </a>
+          </button>
         </div>
       )}
     </div>

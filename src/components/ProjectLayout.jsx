@@ -6,35 +6,43 @@ import Layout from './Layout';
 
 export default function ProjectLayout() {
   const { projectId } = useParams();
-  const { selectedProject, selectProject } = useProject();
+  const { selectedProject, selectProject, loading: contextLoading } = useProject();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const loadProject = async () => {
       try {
+        // Wait for context to finish loading first
+        if (contextLoading) {
+          return;
+        }
+        
         setLoading(true);
         setError(null);
         
         // If no project selected or URL project differs, load it
         if (!selectedProject || selectedProject.id !== parseInt(projectId)) {
           const response = await projectsAPI.getById(projectId);
-          await selectProject(response.data);
+          // Use selectProject which handles localStorage
+          await selectProject(response.data, true); // Add skipNavigation flag
         }
+        setLoading(false);
       } catch (err) {
         console.error('Error loading project:', err);
         setError(err.message);
-      } finally {
         setLoading(false);
       }
     };
 
-    if (projectId) {
+    if (projectId && !contextLoading) {
       loadProject();
+    } else if (!projectId) {
+      setLoading(false);
     }
-  }, [projectId, selectedProject, selectProject]);
+  }, [projectId, selectedProject, selectProject, contextLoading]);
 
-  if (loading) {
+  if (loading || contextLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -45,7 +53,12 @@ export default function ProjectLayout() {
     );
   }
 
-  if (error || !selectedProject) {
+  if (error) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Only redirect if we're certain there's no project after loading
+  if (!selectedProject && !contextLoading && !loading) {
     return <Navigate to="/" replace />;
   }
 

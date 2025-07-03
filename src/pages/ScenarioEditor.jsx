@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ProjectContext } from '../contexts/ProjectContext';
+import { useProject } from '../contexts/ProjectContext';
 import { scenariosAPI, featuresAPI } from '../services/api';
 import ScenarioEditor from '../components/editor/ScenarioEditor';
 import { ArrowLeft } from 'lucide-react';
@@ -12,7 +12,7 @@ export default function ScenarioEditorPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [searchParams] = useSearchParams();
-  const { currentProject } = useContext(ProjectContext);
+  const { selectedProject } = useProject();
   
   const [scenario, setScenario] = useState(null);
   const [feature, setFeature] = useState(null);
@@ -79,9 +79,9 @@ export default function ScenarioEditorPage() {
 
       // Navegar de vuelta a la feature o lista de escenarios
       if (feature) {
-        navigate(`/projects/${currentProject.id}/features/${feature.id}`);
+        navigate(`/projects/${selectedProject.id}/features/${feature.id}`);
       } else {
-        navigate(`/projects/${currentProject.id}/scenarios`);
+        navigate(`/projects/${selectedProject.id}/scenarios`);
       }
     } catch (err) {
       console.error('Error saving scenario:', err);
@@ -93,9 +93,9 @@ export default function ScenarioEditorPage() {
 
   const handleCancel = () => {
     if (feature) {
-      navigate(`/projects/${currentProject.id}/features/${feature.id}`);
+      navigate(`/projects/${selectedProject.id}/features/${feature.id}`);
     } else {
-      navigate(`/projects/${currentProject.id}/scenarios`);
+      navigate(`/projects/${selectedProject.id}/scenarios`);
     }
   };
 

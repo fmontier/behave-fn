@@ -21,6 +21,7 @@ import toast from 'react-hot-toast';
 
 const FeatureCard = ({ feature, onEdit, onDelete, onDownloadBDD, modules }) => {
   const [showMenu, setShowMenu] = useState(false);
+  const { projectId } = useProject();
   
   const getModule = (moduleId) => {
     return modules.find(m => m.id === moduleId);
@@ -50,7 +51,7 @@ const FeatureCard = ({ feature, onEdit, onDelete, onDownloadBDD, modules }) => {
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <Link 
-            to={`/features/${feature.id}`}
+            to={`/project/${projectId}/features/${feature.id}`}
             className="text-lg font-semibold text-gray-900 hover:text-primary-600 transition-colors"
           >
             {feature.title}

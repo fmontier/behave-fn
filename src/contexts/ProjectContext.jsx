@@ -38,11 +38,13 @@ export const ProjectProvider = ({ children }) => {
     loadStoredProject();
   }, []);
 
-  const selectProject = async (project) => {
+  const selectProject = async (project, skipNavigation = false) => {
     try {
       setSelectedProject(project);
       localStorage.setItem('selectedProjectId', project.id.toString());
-      navigate(`/project/${project.id}/dashboard`);
+      if (!skipNavigation) {
+        navigate(`/project/${project.id}/dashboard`);
+      }
     } catch (error) {
       console.error('Error selecting project:', error);
       toast.error('Error al seleccionar el proyecto');
